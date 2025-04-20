@@ -29,7 +29,8 @@ def load_range_data(position, action, opponent_type="標準"):
     
     # Create a base matrix of zeros using numeric ranks (2-14)
     # We'll convert to display ranks when showing the heatmap
-    range_data = pd.DataFrame(0, index=NUMERIC_RANKS, columns=NUMERIC_RANKS)
+    # Use 0.0 to initialize with float64 dtype to avoid warnings when setting float values later
+    range_data = pd.DataFrame(0.0, index=NUMERIC_RANKS, columns=NUMERIC_RANKS)
     
     # Define some basic ranges based on position and action
     # These are simplified approximations
@@ -299,8 +300,11 @@ def create_heatmap(range_data, position, action, opponent_type="標準"):
         ],
         showscale=True,
         colorbar=dict(
-            title="アクション頻度",
-            titleside="right",
+            title=dict(
+                text="アクション頻度",
+                side="right"
+            ),
+            tickmode="array",
             tickvals=[0, 0.16, 0.33, 0.5, 0.67, 0.84, 1],
             ticktext=["FOLD", "FOLD", "FOLD/CALL", "CALL", "CALL/RAISE", "RAISE", "ALL-IN"]
         ),
