@@ -253,7 +253,7 @@ with st.sidebar:
     # About section
     st.markdown("---")
     st.markdown("### FastGTO Light")
-    st.markdown("Version 0.2.0")
+    st.markdown("Version 0.2.1")
     st.markdown("© 2025 All Rights Reserved")
 
 # Simulation Mode Tab
