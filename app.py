@@ -262,13 +262,13 @@ with tab1:
     all_ranks = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
     all_suits = ["♠", "♥", "♦", "♣"]
     
+    # Create tooltips for poker terms
+    def create_tooltip(term, explanation):
+        return f"""<span class="tooltip">{term}<span class="tooltiptext">{explanation}</span></span>"""
+    
     # Determine layout based on mobile mode
     if mobile_mode:
         # Mobile-friendly layout (stacked)
-        # Create tooltips for poker terms
-        def create_tooltip(term, explanation):
-            return f"""<span class="tooltip">{term}<span class="tooltiptext">{explanation}</span></span>"""
-        
         # Load range data
         range_data = load_range_data(position, action, opponent_type)
         
@@ -351,13 +351,13 @@ with tab1:
                 else:
                     row_idx, col_idx = rank1_num, rank2_num
         
-        # Get frequency from range data
-        if row_idx in range_data.index and col_idx in range_data.columns:
-            frequency = range_data.iloc[row_idx, col_idx]
+        # Get frequency from range data - use .loc instead of .iloc to access by index value, not position
+        try:
+            frequency = range_data.loc[row_idx, col_idx]
             
             # Get standard GTO frequency (without opponent type adjustment)
             std_range_data = load_range_data(position, action, "標準")
-            std_frequency = std_range_data.iloc[row_idx, col_idx]
+            std_frequency = std_range_data.loc[row_idx, col_idx]
             
             # Display GTO analysis
             st.markdown(f"""
@@ -375,8 +375,8 @@ with tab1:
                     <p>{get_exploit_suggestion(hand_type, std_frequency, frequency, opponent_type, action)}</p>
                 </div>
                 """, unsafe_allow_html=True)
-        else:
-            st.error("有効なハンドを選択してください。")
+        except Exception as e:
+            st.error(f"有効なハンドを選択してください。エラー: {str(e)}")
         
         # Win rate calculator
         st.header("勝率シミュレーション")
@@ -453,10 +453,6 @@ with tab1:
                 st.error("ホールカードを入力してください。")
     else:
         # Desktop layout (side by side)
-        # Create tooltips for poker terms
-        def create_tooltip(term, explanation):
-            return f"""<span class="tooltip">{term}<span class="tooltiptext">{explanation}</span></span>"""
-        
         # Load range data
         range_data = load_range_data(position, action, opponent_type)
         
@@ -546,12 +542,12 @@ with tab1:
                         row_idx, col_idx = rank1_num, rank2_num
             
             # Get frequency from range data
-            if row_idx in range_data.index and col_idx in range_data.columns:
-                frequency = range_data.iloc[row_idx, col_idx]
+            try:
+                frequency = range_data.loc[row_idx, col_idx]
                 
                 # Get standard GTO frequency (without opponent type adjustment)
                 std_range_data = load_range_data(position, action, "標準")
-                std_frequency = std_range_data.iloc[row_idx, col_idx]
+                std_frequency = std_range_data.loc[row_idx, col_idx]
                 
                 # Display GTO analysis
                 st.markdown(f"""
@@ -569,11 +565,10 @@ with tab1:
                         <p>{get_exploit_suggestion(hand_type, std_frequency, frequency, opponent_type, action)}</p>
                     </div>
                     """, unsafe_allow_html=True)
-            else:
-                st.error("有効なハンドを選択してください。")
-        
-        # Column 2: Win rate calculator
-        with col2:
+            except Exception as e:
+                st.error(f"有効なハンドを選択してください。エラー: {str(e)}")
+            
+            # Win rate calculator
             st.header("勝率シミュレーター")
             
             # Board input
@@ -598,7 +593,7 @@ with tab1:
                 with col_board3:
                     board_ranks[2] = st.selectbox("フロップ3のランク:", ["", "A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"], key="board3_rank")
                     board_suits[2] = st.selectbox("フロップ3のスート:", ["", "♠", "♥", "♦", "♣"], key="board3_suit")
-                
+                                
                 col_board4, col_board5 = st.columns(2)
                 
                 with col_board4:
